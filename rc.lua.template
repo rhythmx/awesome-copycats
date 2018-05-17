@@ -61,6 +61,8 @@ end
 -- run_once({ "unclutter -root" }) -- entries must be comma-separated
 -- }}}
 
+run_once({ "compton -cC" })
+
 -- {{{ Variable definitions
 
 local themes = {
@@ -589,7 +591,15 @@ for i = 1, 9 do
                      end
                   end,
                   descr_move),
-        -- Toggle tag on focused client.
+    -- transparency +
+    awful.key({ modkey }, "Next", function (c)
+        awful.util.spawn("transset-df --actual --dec 0.01  ")
+    end),
+    -- transparency -
+    awful.key({ modkey }, "Prior", function (c)
+        awful.util.spawn("transset-df --actual --inc 0.01  ")
+    end),
+    -- Toggle tag on focused client.
         awful.key({ modkey, "Control", "Shift" }, "#" .. i + 9,
                   function ()
                       if client.focus then
@@ -631,7 +641,7 @@ awful.rules.rules = {
 
     -- Titlebars
     { rule_any = { type = { "dialog", "normal" } },
-      properties = { titlebars_enabled = true } },
+      properties = { titlebars_enabled = false } },
 
     -- Set Firefox to always map on the first tag on screen 1.
     { rule = { class = "Firefox" },
@@ -655,6 +665,8 @@ client.connect_signal("manage", function (c)
         -- Prevent clients from being unreachable after screen count changes.
         awful.placement.no_offscreen(c)
     end
+    c.opacity = 0.6
+
 end)
 
 -- Add a titlebar if titlebars_enabled is set to true in the rules.
@@ -727,4 +739,12 @@ end
 client.connect_signal("focus", border_adjust)
 client.connect_signal("property::maximized", border_adjust)
 client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
+
+
+client.connect_signal("focus", function(c)
+                              c.opacity = 1
+                           end)
+client.connect_signal("unfocus", function(c)
+                                c.opacity = 0.6
+                             end)
 -- }}}
