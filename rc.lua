@@ -72,6 +72,7 @@ run_once({
     "/bin/sh -c 'xinput --disable $(xinput list | grep Touchpad | grep -o \"id=[[:digit:]]*\" | cut -d \"=\" -f2)'",
     "nm-applet",
     "signal-desktop",
+    "slack",
     "picom -b", 
 })
 
