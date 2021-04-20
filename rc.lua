@@ -73,7 +73,9 @@ run_once({
     "nm-applet",
     "signal-desktop",
     "slack",
-    "picom -b", 
+    -- "picom -b",
+    "xfce4-clipman",
+    "/bin/sh -c '$HOME/.screenlayout/default.arandr.sh'"
 })
 
 -- }}}
@@ -81,6 +83,7 @@ run_once({
 -- {{{ Variable definitions
 
 local themes = {
+
     "blackburn",       -- 1
     "copland",         -- 2
     "dremora",         -- 3
@@ -93,13 +96,13 @@ local themes = {
     "vertex",          -- 10
 }
 
-local chosen_theme = themes[6]
+local chosen_theme = themes[4]
 local modkey       = "Mod4"
 local altkey       = "Mod1"
 local terminal     = os.getenv("TERM_PROG") or "gnome-terminal"
 local vi_focus     = false -- vi-like client focus - https://github.com/lcpz/awesome-copycats/issues/275
 local cycle_prev   = true -- cycle trough all previous client or just the first -- https://github.com/lcpz/awesome-copycats/issues/274
-local editor       = os.getenv("EDITOninja -C build installR") or "vim"
+local editor       = os.getenv("EDITOR") or "vim"
 local gui_editor   = os.getenv("GUI_EDITOR") or "gvim"
 local browser      = os.getenv("BROWSER") or "firefox"
 local scrlocker    = "slock"
@@ -263,7 +266,7 @@ root.buttons(my_table.join(
 globalkeys = my_table.join(
     -- Take a screenshot
     -- https://github.com/lcpz/dots/blob/master/bin/screenshot
-    awful.key({ altkey }, "p", function() os.execute("screenshot") end,
+  awful.key({ altkey }, "p", function() awful.spawn.with_shell("DISPLAY=:0 gnome-screenshot -a -c") end,
               {description = "take a screenshot", group = "hotkeys"}),
 
     -- X screen locker
@@ -433,12 +436,12 @@ globalkeys = my_table.join(
               {description = "dropdown application", group = "launcher"}),
 
     -- Widgets popups
-    awful.key({ altkey, }, "c", function () if beautiful.cal then beautiful.cal.show(7) end end,
-              {description = "show calendar", group = "widgets"}),
-    awful.key({ altkey, }, "h", function () if beautiful.fs then beautiful.fs.show(7) end end,
-              {description = "show filesystem", group = "widgets"}),
-    awful.key({ altkey, }, "w", function () if beautiful.weather then beautiful.weather.show(7) end end,
-              {description = "show weather", group = "widgets"}),
+    --awful.key({ altkey, }, "c", function () if beautiful.cal then beautiful.cal.show(7) end end,
+    --          {description = "show calendar", group = "widgets"}),
+    --awful.key({ altkey, }, "h", function () if beautiful.fs then beautiful.fs.show(7) end end,
+    --          {description = "show filesystem", group = "widgets"}),
+    --awful.key({ altkey, }, "w", function () if beautiful.weather then beautiful.weather.show(7) end end,
+    --          {description = "show weather", group = "widgets"}),
 
     -- Brightness
     awful.key({ }, "XF86MonBrightnessUp", function () os.execute("xbacklight -inc 10") end,
@@ -447,36 +450,36 @@ globalkeys = my_table.join(
               {description = "-10%", group = "hotkeys"}),
 
     -- ALSA volume control
-    awful.key({ altkey }, "Up",
+    awful.key({ }, "XF86AudioRaiseVolume",
         function ()
             os.execute(string.format("amixer -q set %s 1%%+", beautiful.volume.channel))
             beautiful.volume.update()
         end,
         {description = "volume up", group = "hotkeys"}),
-    awful.key({ altkey }, "Down",
+    awful.key({ }, "XF86AudioLowerVolume",
         function ()
             os.execute(string.format("amixer -q set %s 1%%-", beautiful.volume.channel))
             beautiful.volume.update()
         end,
         {description = "volume down", group = "hotkeys"}),
-    --awful.key({ altkey }, "m",
+    awful.key({ }, "XF86AudioMute",
+        function ()
+            os.execute(string.format("amixer -q set %s toggle", beautiful.volume.togglechannel or beautiful.volume.channel))
+           beautiful.volume.update()
+        end,
+        {description = "toggle mute", group = "hotkeys"}),
+    --awful.key({ altkey, "Control" }, "m",
     --    function ()
-    --        os.execute(string.format("amixer -q set %s toggle", beautiful.volume.togglechannel or beautiful.volume.channel))
+    --        os.execute(string.format("amixer -q set %s 100%%", beautiful.volume.channel))
     --        beautiful.volume.update()
     --    end,
-    --    {description = "toggle mute", group = "hotkeys"}),
-    awful.key({ altkey, "Control" }, "m",
-        function ()
-            os.execute(string.format("amixer -q set %s 100%%", beautiful.volume.channel))
-            beautiful.volume.update()
-        end,
-        {description = "volume 100%", group = "hotkeys"}),
-    awful.key({ altkey, "Control" }, "0",
-        function ()
-            os.execute(string.format("amixer -q set %s 0%%", beautiful.volume.channel))
-            beautiful.volume.update()
-        end,
-        {description = "volume 0%", group = "hotkeys"}),
+    --    {description = "volume 100%", group = "hotkeys"}),
+    --awful.key({ altkey, "Control" }, "0",
+    --    function ()
+    --        os.execute(string.format("amixer -q set %s 0%%", beautiful.volume.channel))
+    --        beautiful.volume.update()
+    --    end,
+    --    {description = "volume 0%", group = "hotkeys"}),
 
     -- MPD control
     awful.key({ altkey, "Control" }, "Up",
@@ -527,7 +530,7 @@ globalkeys = my_table.join(
     -- User programs
     awful.key({ modkey }, "q", function () awful.spawn(browser) end,
               {description = "run browser", group = "launcher"}),
-    awful.key({ modkey }, "a", function () awful.spawn(guieditor) end,
+    awful.key({ modkey }, "a", function () awful.spawn(gui_editor) end,
               {description = "run gui editor", group = "launcher"}),
 
     -- Default
